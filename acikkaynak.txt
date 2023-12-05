@@ -1,4 +1,80 @@
+const readline = require("readline");
 
-	console.log("Kadir Erdemci")
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
+const words = [
+  "javascript",
+  "nodejs",
+  "programming",
+  "kadir",
+  "erdemci",
+  "inonu",
+];
 
+function getRandomWord() {
+  return words[Math.floor(Math.random() * words.length)];
+}
+
+function startGame() {
+  console.log("Kelime tahmin oyununa hoş geldiniz!");
+  const secretWord = getRandomWord();
+  const guessedLetters = [];
+  let remainingAttempts = 6;
+
+  console.log(
+    `Tahmin etmeniz gereken kelime ${secretWord.length} harf içeriyor.`
+  );
+
+  function displayWord() {
+    const display = secretWord
+      .split("")
+      .map((letter) => (guessedLetters.includes(letter) ? letter : "_"))
+      .join(" ");
+    console.log(`Tahmin: ${display}`);
+  }
+
+  function takeGuess() {
+    rl.question("Bir harf tahmin edin: ", (guess) => {
+      const guessedLetter = guess.toLowerCase();
+
+      if (!guessedLetter.match(/[a-z]/)) {
+        console.log("Geçerli bir harf girin.");
+      } else if (guessedLetters.includes(guessedLetter)) {
+        console.log(
+          "Bu harfi zaten tahmin ettiniz. Lütfen farklı bir harf deneyin."
+        );
+      } else {
+        guessedLetters.push(guessedLetter);
+        if (!secretWord.includes(guessedLetter)) {
+          remainingAttempts--;
+          console.log(
+            `Maalesef, yanlış tahmin. Kalan hakkınız: ${remainingAttempts}`
+          );
+        }
+        displayWord();
+
+        if (
+          secretWord
+            .split("")
+            .every((letter) => guessedLetters.includes(letter))
+        ) {
+          console.log("Tebrikler! Kelimeyi doğru tahmin ettiniz.");
+          rl.close();
+        } else if (remainingAttempts === 0) {
+          console.log(`Oyun bitti. Doğru kelime: ${secretWord}`);
+          rl.close();
+        } else {
+          takeGuess();
+        }
+      }
+    });
+  }
+
+  displayWord();
+  takeGuess();
+}
+
+startGame();
